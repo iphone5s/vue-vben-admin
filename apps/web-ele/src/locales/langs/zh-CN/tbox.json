@@ -1,0 +1,9 @@
+{
+  "menu": {
+    "dashboard": "概况",
+    "appstore": "App Store",
+    "certificate": "证书管理 ",
+    "user": "用户管理",
+    "setting": "系统设置"
+  }
+}

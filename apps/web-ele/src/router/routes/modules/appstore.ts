@@ -6,12 +6,12 @@ const routes: RouteRecordRaw[] = [
   {
     meta: {
       icon: 'lucide:layout-dashboard',
-      order: 0,
-      title: $t('tbox.menu.dashboard'),
+      order: 1,
+      title: $t('tbox.menu.appstore'),
     },
-    name: 'dashboard',
-    path: '/dashboard',
-    component: () => import('#/views/certificate/list/index.vue'),
+    name: 'appstore',
+    path: '/appstore',
+    component: () => import('#/views/dashboard/analytics/index.vue'),
   },
 ];
 
