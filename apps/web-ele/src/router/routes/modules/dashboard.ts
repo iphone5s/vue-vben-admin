@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     },
     name: 'dashboard',
     path: '/dashboard',
-    component: () => import('#/views/certificate/list/index.vue'),
+    component: () => import('#/views/dashboard/analytics/index.vue'),
   },
 ];
 
