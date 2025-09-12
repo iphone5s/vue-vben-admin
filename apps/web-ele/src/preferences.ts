@@ -9,5 +9,29 @@ export const overridesPreferences = defineOverridesPreferences({
   // overrides
   app: {
     name: import.meta.env.VITE_APP_TITLE,
+    enablePreferences:false,
+  },
+  theme: {
+    mode: 'light',
+  },
+  copyright: {
+    companyName: 'Tbox',
+    companySiteLink: 'https://www.tbox.com',
+    date: '2025',
+    enable: true,
+  },
+  footer: {
+    enable: true,
+    fixed: true,
+  },
+  widget: {
+    fullscreen: false,
+    globalSearch: false,
+    languageToggle: false,
+    lockScreen: false,
+    notification: false,
+    refresh: false,
+    sidebarToggle: false,
+    themeToggle: false,
   },
 });
