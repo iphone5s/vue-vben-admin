@@ -10,6 +10,7 @@ export const overridesPreferences = defineOverridesPreferences({
   app: {
     name: import.meta.env.VITE_APP_TITLE,
     enablePreferences:false,
+    defaultHomePath:"/dashboard"
   },
   theme: {
     mode: 'light',

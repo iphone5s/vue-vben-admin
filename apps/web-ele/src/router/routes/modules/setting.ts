@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
     },
     name: 'setting',
     path: '/setting',
-    component: () => import('#/views/dashboard/analytics/index.vue'),
+    component: () => import('#/views/setting/about/index.vue'),
   },
 ];
 
