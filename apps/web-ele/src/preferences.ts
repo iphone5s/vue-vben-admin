@@ -36,4 +36,8 @@ export const overridesPreferences = defineOverridesPreferences({
     sidebarToggle: false,
     themeToggle: false,
   },
+  tabbar:{
+    showMaximize:false,
+    showMore:false,
+  },
 });
