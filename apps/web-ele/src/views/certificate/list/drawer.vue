@@ -1,19 +1,30 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { useVbenDrawer } from '@vben/common-ui';
-import { ElForm, ElFormItem, ElInput, ElButton } from 'element-plus';
+import { ElForm, ElFormItem, ElInput, ElInputNumber } from 'element-plus';
 
-const form = ref({
+interface FormType {
+  appleId: string;
+  iPhoneMax: number;
+  iPadMax: number;
+  privateKey: string;
+  privateKeyId: string;
+  issuer: string;
+  remark: string;
+}
+
+// 初始化表单默认值
+const form = ref<FormType>({
   appleId: '',
-  name: '',
-  iPhone: '',
-  iPad: '',
-  expire: '',
-  status: '',
+  iPhoneMax: 50, // 默认值 50，范围 1-200
+  iPadMax: 20,   // 默认值 20，范围 1-100
+  privateKey: '',
+  privateKeyId: '',
+  issuer: '',
+  remark: '',
 });
 
-const drawerTitle = ref('新建证书'); // 默认标题
-
+const drawerTitle = ref('新建证书');
 const data = ref<Record<string, any> | null>(null);
 
 const [Drawer, drawerApi] = useVbenDrawer({
@@ -26,7 +37,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
   onOpenChange(isOpen: boolean) {
     if (isOpen) {
-      const externalData = drawerApi.getData<{ title?: string; record?: any }>();
+      const externalData = drawerApi.getData<{ title?: string; record?: FormType }>();
       if (externalData?.record) {
         // 编辑模式
         drawerTitle.value = externalData.title || '编辑证书';
@@ -34,7 +45,15 @@ const [Drawer, drawerApi] = useVbenDrawer({
       } else {
         // 新建模式
         drawerTitle.value = externalData?.title || '新建证书';
-        form.value = { appleId: '', name: '', iPhone: '', iPad: '', expire: '', status: '' };
+        form.value = {
+          appleId: '',
+          iPhoneMax: 50,
+          iPadMax: 20,
+          privateKey: '',
+          privateKeyId: '',
+          issuer: '',
+          remark: '',
+        };
       }
       data.value = externalData;
     }
@@ -45,31 +64,61 @@ const [Drawer, drawerApi] = useVbenDrawer({
 <template>
   <Drawer :title="drawerTitle">
     <div class="p-4 flex flex-col gap-3">
-      <ElForm :model="form" label-width="100px">
-        <ElFormItem label="Apple Id">
-          <ElInput v-model="form.appleId" placeholder="请输入 Apple Id" />
+      <ElForm :model="form" label-width="140px">
+        <ElFormItem label="Apple ID">
+          <ElInput v-model="form.appleId" placeholder="请输入 Apple ID" />
         </ElFormItem>
-        <ElFormItem label="名称">
-          <ElInput v-model="form.name" placeholder="请输入名称" />
+
+        <ElFormItem label="iPhone证书最大数量">
+          <ElInputNumber
+            v-model="form.iPhoneMax"
+            :min="1"
+            :max="200"
+            placeholder="请输入iPhone证书最大数量"
+          />
         </ElFormItem>
-        <ElFormItem label="iPhone">
-          <ElInput v-model="form.iPhone" placeholder="请输入 iPhone 型号" />
+
+        <ElFormItem label="iPad证书最大数量">
+          <ElInputNumber
+            v-model="form.iPadMax"
+            :min="1"
+            :max="100"
+            placeholder="请输入 iPad 最大数量"
+          />
         </ElFormItem>
-        <ElFormItem label="iPad">
-          <ElInput v-model="form.iPad" placeholder="请输入 iPad 型号" />
+
+        <ElFormItem label="证书密钥">
+          <ElInput
+            type="textarea"
+            v-model="form.privateKey"
+            placeholder="请输入密钥"
+            :rows="6"
+          />
         </ElFormItem>
-        <ElFormItem label="到期时间">
-          <ElInput v-model="form.expire" placeholder="请输入到期时间" />
+
+        <ElFormItem label="密钥ID">
+          <ElInput
+            v-model="form.privateKeyId"
+            placeholder="密钥ID"
+          />
         </ElFormItem>
-        <ElFormItem label="状态">
-          <ElInput v-model="form.status" placeholder="请输入状态" />
+
+        <ElFormItem label="Issuer">
+          <ElInput
+            v-model="form.issuer"
+            placeholder="请输入Issuer"
+          />
+        </ElFormItem>
+
+        <ElFormItem label="备注">
+          <ElInput
+            type="textarea"
+            v-model="form.remark"
+            placeholder="请备注appleid的相关账号密码信息，以方便后续登录需要"
+            :rows="4"
+          />
         </ElFormItem>
       </ElForm>
-
-      <div class="flex justify-end gap-2 mt-4">
-        <ElButton @click="drawerApi.close()">取消</ElButton>
-        <ElButton type="primary" @click="drawerApi.onConfirm()">确定</ElButton>
-      </div>
     </div>
   </Drawer>
 </template>

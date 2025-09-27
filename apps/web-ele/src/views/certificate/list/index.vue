@@ -14,8 +14,8 @@ import ExtraDrawer from './drawer.vue';
 
 // 表格数据
 const tableData = ref([
-  { id: '1', appleId: 'test1@apple.com', name: '名称A', iPhone: 'iPhone12', iPad: 'iPad Pro', status: '正常', expire: '2025-01-01' },
-  { id: '2', appleId: 'test2@apple.com', name: '名称B', iPhone: 'iPhone13', iPad: 'iPad Air', status: '正常', expire: '2025-02-01' },
+  { id: '1', appleId: 'test1@apple.com', name: '名称A', iPhone: '50', iPad: '10/20', status: '正常', expire: '2025-01-01' },
+  { id: '2', appleId: 'test2@apple.com', name: '名称B', iPhone: '130/200', iPad: '10/20', status: '正常', expire: '2025-02-01' },
 ]);
 
 // ====== 抽屉相关 ======
