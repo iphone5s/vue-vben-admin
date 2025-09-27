@@ -35,11 +35,11 @@ const [Drawer, drawerApi] = useVbenDrawer({
   onCancel() {
     drawerApi.close();
   },
-  onConfirm() {
+  onConfirm: async () => {
     console.log('提交表单数据:', form.value);
     drawerApi.setState({ loading: true });
-   // await certificateStore.fetchCertificates();
-    //drawerApi.close();
+    await certificateStore.fetchCertificates();
+    drawerApi.close();
   },
   onOpenChange(isOpen: boolean) {
     if (isOpen) {
