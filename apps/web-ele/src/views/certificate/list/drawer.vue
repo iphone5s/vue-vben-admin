@@ -3,6 +3,10 @@ import { ref } from 'vue';
 import { useVbenDrawer } from '@vben/common-ui';
 import { ElForm, ElFormItem, ElInput, ElInputNumber } from 'element-plus';
 
+import { useCertificateStore } from '#/store';
+
+const certificateStore = useCertificateStore();
+
 interface FormType {
   appleId: string;
   iPhoneMax: number;
@@ -33,7 +37,9 @@ const [Drawer, drawerApi] = useVbenDrawer({
   },
   onConfirm() {
     console.log('提交表单数据:', form.value);
-    drawerApi.close();
+    drawerApi.setState({ loading: true });
+   // await certificateStore.fetchCertificates();
+    //drawerApi.close();
   },
   onOpenChange(isOpen: boolean) {
     if (isOpen) {
