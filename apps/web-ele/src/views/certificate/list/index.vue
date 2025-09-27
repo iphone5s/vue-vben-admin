@@ -92,7 +92,7 @@ const [Form] = useVbenForm({
         <ElTable :data="tableData" border style="width: 100%">
           <ElTableColumn label="序号" prop="id" width="80" />
           <ElTableColumn label="Apple Id" prop="appleId" />
-          <ElTableColumn label="名称" prop="name" />
+          <ElTableColumn label="证书名称" prop="name" />
           <ElTableColumn label="iPhone" prop="iPhone" />
           <ElTableColumn label="iPad" prop="iPad" />
           <ElTableColumn label="到期时间" prop="expire" />
