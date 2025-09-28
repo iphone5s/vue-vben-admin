@@ -38,7 +38,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
   onConfirm: async () => {
     console.log('提交表单数据:', form.value);
     drawerApi.setState({ loading: true });
-    await certificateStore.addCertificate();
+    await certificateStore.addCertificate(form.value);
     drawerApi.close();
   },
   onOpenChange(isOpen: boolean) {
