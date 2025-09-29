@@ -4,9 +4,37 @@ import { useCertificateStore } from '#/store/certificate';
 
 const certificateStore = useCertificateStore();
 
-// VxeTable 配置
+const handleDetail = (row: any) => console.log('证书详情', row);
+const handleEdit = (row: any) => console.log('编辑证书', row);
+const handleDelete = (row: any) => console.log('删除证书', row);
+
 const [Grid] = useVbenVxeGrid({
+  formOptions: {
+    collapsed: false,
+    schema: [
+      {
+        component: 'Input',
+        fieldName: 'appleId',
+        label: 'Apple Id',
+        componentProps: { placeholder: '请输入 Apple Id' },
+      },
+      {
+        component: 'Input',
+        fieldName: 'certificateName',
+        label: '证书名称',
+        componentProps: { placeholder: '请输入证书名称' },
+      },
+    ],
+    submitButtonOptions: { content: '查询' },
+    showCollapseButton: true,
+  },
   gridOptions: {
+    fit: true,           // 自动按容器宽度调整列宽
+    autoResize: true,    // 随容器变化自动调整
+    border: true,
+    stripe: true,
+    showOverflow: true,
+    height: 'auto',
     columns: [
       { field: 'id', title: 'ID', width: 80 },
       { field: 'appleId', title: 'Apple Id', width: 180 },
@@ -14,7 +42,7 @@ const [Grid] = useVbenVxeGrid({
       {
         field: 'iphone',
         title: 'iPhone',
-        width: 120,
+        minWidth: 120,
         cellRender: {
           name: 'CellCustom',
           options: {
@@ -28,7 +56,7 @@ const [Grid] = useVbenVxeGrid({
       {
         field: 'ipad',
         title: 'iPad',
-        width: 100,
+        minWidth: 100,
         cellRender: {
           name: 'CellCustom',
           options: {
@@ -39,11 +67,11 @@ const [Grid] = useVbenVxeGrid({
           }
         }
       },
-      { field: 'expiryDate', title: '到期时间', width: 130 },
+      { field: 'expiryDate', title: '到期时间', minWidth: 130 },
       {
         field: 'status',
         title: '状态',
-        width: 100,
+        minWidth: 100,
         cellRender: {
           name: 'CellCustom',
           options: {
@@ -57,43 +85,37 @@ const [Grid] = useVbenVxeGrid({
       {
         field: 'action',
         title: '操作',
-        width: 220,
-        cellRender: {
-          name: 'CellCustom',
-          options: {
-            renderContent: () => '详情 | 编辑 | 删除'
-          }
-        }
+        minWidth: 220,
+        slots: { default: 'action' }  // 自定义操作列
       }
     ],
     proxyConfig: {
-      props: {
-        result: 'items', // 数据数组
-        total: 'total',  // 总数
-      },
+      props: { result: 'items', total: 'total' },
       ajax: {
         query: async () => {
-          // fetchCertificates 已返回 { items, total }
           const data = await certificateStore.fetchCertificates();
           console.log('VxeTable query 返回:', data);
-          return data; 
+          return data;
         }
       }
     },
     toolbarConfig: {
-      refresh: true, // 自带刷新按钮
-      zoom: true
-    },
-    border: true,
-    stripe: true,
-    showOverflow: true,
-    height: 'auto'
+      refresh: true,
+      zoom: true,
+      search: true
+    }
   }
 });
 </script>
 
 <template>
-  <div class="p-4">
-    <Grid table-title="证书列表" />
+  <div class="p-4 w-full">
+    <Grid table-title="证书列表">
+      <template #action="{ row }">
+        <button class="mr-2 text-blue-500" @click="handleDetail(row)">详情</button>
+        <button class="mr-2 text-green-500" @click="handleEdit(row)">编辑</button>
+        <button class="text-red-500" @click="handleDelete(row)">删除</button>
+      </template>
+    </Grid>
   </div>
 </template>
