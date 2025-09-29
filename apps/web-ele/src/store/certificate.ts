@@ -1,4 +1,3 @@
-// stores/certificate.ts
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import {
@@ -13,57 +12,46 @@ export const useCertificateStore = defineStore('certificate', () => {
   const loading = ref(false);
   const certificates = ref<Certificate[]>([]);
 
-  /** 获取证书列表 */
+  /** 获取证书列表，直接返回 getCertificateListApi 的结果 */
   async function fetchCertificates() {
     loading.value = true;
     try {
       const data = await getCertificateListApi();
-      certificates.value = data;
+      certificates.value = data.items; // 如果你还想在 store 里保存列表
+      return data; // { items, total } 直接返回
     } catch (err) {
       console.error('获取证书列表失败', err);
-      throw err;
+      return { items: [], total: 0 };
     } finally {
       loading.value = false;
     }
   }
 
-  /** 添加证书（自动刷新列表） */
   async function addCertificate(payload: Certificate) {
     loading.value = true;
     try {
       await addCertificateApi(payload);
       await fetchCertificates();
-    } catch (err) {
-      console.error('添加证书失败', err);
-      throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  /** 编辑证书（自动刷新列表） */
   async function updateCertificate(id: number, payload: Certificate) {
     loading.value = true;
     try {
       await updateCertificateApi(id, payload);
       await fetchCertificates();
-    } catch (err) {
-      console.error('更新证书失败', err);
-      throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  /** 删除证书（自动刷新列表） */
   async function removeCertificate(id: number) {
     loading.value = true;
     try {
       await deleteCertificateApi(id);
       await fetchCertificates();
-    } catch (err) {
-      console.error('删除证书失败', err);
-      throw err;
     } finally {
       loading.value = false;
     }

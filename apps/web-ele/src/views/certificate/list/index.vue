@@ -1,141 +1,99 @@
-<script lang="ts" setup>
-import { onMounted } from 'vue';
-import { ElCard, ElTable, ElTableColumn, ElButton, ElMessage } from 'element-plus';
-import { Page, useVbenForm, useVbenDrawer } from '@vben/common-ui';
+<script setup lang="ts">
+import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { useCertificateStore } from '#/store/certificate';
 
-import ExtraDrawer from './drawer.vue';
-import { useCertificateStore } from '#/store';
-
-// ====== Pinia store ======
 const certificateStore = useCertificateStore();
 
-// ====== 抽屉 ======
-const [Drawer, drawerApi] = useVbenDrawer({
-  connectedComponent: ExtraDrawer,
-});
-
-// 添加
-const handleAdd = () => {
-  drawerApi.setData({ title: '新建证书', record: null }).open();
-};
-
-// 编辑
-const handleEdit = (row: any) => {
-  drawerApi.setData({ title: '编辑证书', record: row }).open();
-};
-
-// 删除
-const handleDelete = async (row: any) => {
-  try {
-    await certificateStore.removeCertificate(row.id);
-    ElMessage.success('删除成功');
-  } catch (err) {
-    ElMessage.error('删除失败');
-    console.error(err);
-  }
-};
-
-// 查看证书详情
-const handleDetail = (row: any) => {
-  drawerApi.setData({ title: '证书详情', record: row, readonly: true }).open();
-};
-
-// 刷新
-const handleRefresh = async () => {
-  try {
-    await certificateStore.fetchCertificates();
-    ElMessage.success('列表已刷新');
-  } catch (err) {
-    ElMessage.error('刷新失败');
-    console.error(err);
-  }
-};
-
-// 查询表单
-const [Form] = useVbenForm({
-  layout: 'horizontal',
-  submitButtonOptions: { content: '查询', style: 'margin-left: 10px;' },
-  handleSubmit: (values) => {
-    ElMessage.success(`表单数据：${JSON.stringify(values)}`);
-  },
-  schema: [
-    {
-      component: 'Input',
-      fieldName: 'appleId',
-      label: 'Apple Id',
-      componentProps: { style: 'width: 240px', placeholder: '请输入苹果账号' },
+// VxeTable 配置
+const [Grid] = useVbenVxeGrid({
+  gridOptions: {
+    columns: [
+      { field: 'id', title: 'ID', width: 80 },
+      { field: 'appleId', title: 'Apple Id', width: 180 },
+      { field: 'certificateName', title: '证书名称', width: 200 },
+      {
+        field: 'iphone',
+        title: 'iPhone',
+        width: 120,
+        cellRender: {
+          name: 'CellCustom',
+          options: {
+            renderContent: ({ row }) => `${row.iphone + row.mac} / ${row.iphoneMax}`,
+            renderStyle: ({ row }) => ({
+              color: row.iphone + row.mac > row.iphoneMax ? 'red' : 'inherit'
+            })
+          }
+        }
+      },
+      {
+        field: 'ipad',
+        title: 'iPad',
+        width: 100,
+        cellRender: {
+          name: 'CellCustom',
+          options: {
+            renderContent: ({ row }) => `${row.ipad} / ${row.ipadMax}`,
+            renderStyle: ({ row }) => ({
+              color: row.ipad > row.ipadMax ? 'red' : 'inherit'
+            })
+          }
+        }
+      },
+      { field: 'expiryDate', title: '到期时间', width: 130 },
+      {
+        field: 'status',
+        title: '状态',
+        width: 100,
+        cellRender: {
+          name: 'CellCustom',
+          options: {
+            renderContent: ({ row }) => row.status,
+            renderStyle: ({ row }) => ({
+              color: row.status === '正常' ? 'green' : 'red'
+            })
+          }
+        }
+      },
+      {
+        field: 'action',
+        title: '操作',
+        width: 220,
+        cellRender: {
+          name: 'CellCustom',
+          options: {
+            renderContent: () => '详情 | 编辑 | 删除'
+          }
+        }
+      }
+    ],
+    proxyConfig: {
+      props: {
+        result: 'items', // 数据数组
+        total: 'total',  // 总数
+      },
+      ajax: {
+        query: async () => {
+          // fetchCertificates 已返回 { items, total }
+          const data = await certificateStore.fetchCertificates();
+          console.log('VxeTable query 返回:', data);
+          return data; 
+        }
+      }
     },
-  ],
-});
-
-// 初始化
-onMounted(async () => {
-  await certificateStore.fetchCertificates();
+    toolbarConfig: {
+      refresh: true, // 自带刷新按钮
+      zoom: true
+    },
+    border: true,
+    stripe: true,
+    showOverflow: true,
+    height: 'auto'
+  }
 });
 </script>
 
 <template>
-  <Page>
-    <div>
-      <!-- 查询表单 -->
-      <ElCard class="mb-5">
-        <Form />
-      </ElCard>
-
-      <!-- 表格 -->
-      <ElCard class="mb-5">
-        <div class="mb-3 flex justify-end gap-2">
-          <ElButton type="primary" @click="handleAdd">添加</ElButton>
-          <ElButton @click="handleRefresh">刷新</ElButton>
-        </div>
-
-        <ElTable :data="certificateStore.certificates" border style="width: 100%">
-          <ElTableColumn label="序号" prop="id" width="60" />
-          <ElTableColumn label="Apple Id" prop="appleId" min-width="220" />
-          <ElTableColumn label="证书名称" prop="certificateName" min-width="200" />
-
-          <!-- iPhone -->
-          <ElTableColumn label="iPhone" min-width="100">
-            <template #default="scope">
-              <span :style="{ color: (scope.row.iphone + scope.row.mac) > scope.row.iphoneMax ? 'red' : 'inherit' }">
-                {{ scope.row.iphone + scope.row.mac }} / {{ scope.row.iphoneMax }}
-              </span>
-            </template>
-          </ElTableColumn>
-
-          <!-- iPad -->
-          <ElTableColumn label="iPad" min-width="100">
-            <template #default="scope">
-              <span :style="{ color: scope.row.ipad > scope.row.ipadMax ? 'red' : 'inherit' }">
-                {{ scope.row.ipad }} / {{ scope.row.ipadMax }}
-              </span>
-            </template>
-          </ElTableColumn>
-
-          <ElTableColumn label="到期时间" prop="expiryDate" min-width="120" />
-
-          <!-- 状态 -->
-          <ElTableColumn label="状态" min-width="80">
-            <template #default="scope">
-              <span :style="{ color: scope.row.status === '正常' ? 'green' : 'red' }">
-                {{ scope.row.status }}
-              </span>
-            </template>
-          </ElTableColumn>
-
-          <!-- 操作 -->
-          <ElTableColumn label="操作" min-width="240">
-            <template #default="scope">
-              <ElButton link type="primary" size="small" @click="handleDetail(scope.row)">详情</ElButton>
-              <ElButton link type="primary" size="small" @click="handleEdit(scope.row)">编辑</ElButton>
-              <ElButton link type="danger" size="small" @click="handleDelete(scope.row)">删除</ElButton>
-            </template>
-          </ElTableColumn>
-        </ElTable>
-      </ElCard>
-    </div>
-
-    <!-- 抽屉 -->
-    <Drawer />
-  </Page>
+  <div class="p-4">
+    <Grid table-title="证书列表" />
+  </div>
 </template>
