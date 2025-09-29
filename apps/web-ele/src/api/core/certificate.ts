@@ -13,7 +13,7 @@ export interface Certificate {
 }
 
 export function getCertificateListApi() {
-  return requestClient.get<Certificate[]>('/certificate');
+  return requestClient.post<Certificate[]>('/certificate/certificatelist');
 }
 
 export function addCertificateApi(data: Certificate) {

@@ -1,61 +1,54 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted } from 'vue';
+import { ElCard, ElTable, ElTableColumn, ElButton, ElMessage } from 'element-plus';
 import { Page, useVbenForm, useVbenDrawer } from '@vben/common-ui';
-import {
-  ElCard,
-  ElTable,
-  ElTableColumn,
-  ElButton,
-  ElMessage,
-} from 'element-plus';
 
-// 引入抽屉内容
 import ExtraDrawer from './drawer.vue';
+import { useCertificateStore } from '#/store';
 
-// 表格数据
-const tableData = ref([
-  { id: '1', appleId: 'test1@apple.com', name: '名称A', iPhone: '50', iPad: '10/20', status: '正常', expire: '2025-01-01' },
-  { id: '2', appleId: 'test2@apple.com', name: '名称B', iPhone: '130/200', iPad: '10/20', status: '正常', expire: '2025-02-01' },
-]);
+const certificateStore = useCertificateStore();
 
-// ====== 抽屉相关 ======
+// 抽屉
 const [Drawer, drawerApi] = useVbenDrawer({
   connectedComponent: ExtraDrawer,
 });
 
-// 添加按钮
+// 添加
 const handleAdd = () => {
-  drawerApi.setData({
-    title: '新建证书',
-    record: null,
-  }).open();
+  drawerApi.setData({ title: '新建证书', record: null }).open();
 };
 
-// 编辑按钮
+// 编辑
 const handleEdit = (row: any) => {
-  drawerApi.setData({
-    title: '编辑证书',
-    record: row,
-  }).open();
+  drawerApi.setData({ title: '编辑证书', record: row }).open();
 };
 
-// 删除按钮
-const handleDelete = (row: any) => {
-  ElMessage.warning(`点击删除，序号：${row.id}`);
+// 删除
+const handleDelete = async (row: any) => {
+  try {
+    await certificateStore.removeCertificate(row.id);
+    ElMessage.success('删除成功');
+  } catch (err) {
+    ElMessage.error('删除失败');
+    console.error(err);
+  }
 };
 
-// 刷新按钮
-const handleRefresh = () => {
-  ElMessage.success('点击刷新');
+// 刷新
+const handleRefresh = async () => {
+  try {
+    await certificateStore.fetchCertificates();
+    ElMessage.success('列表已刷新');
+  } catch (err) {
+    ElMessage.error('刷新失败');
+    console.error(err);
+  }
 };
 
-// ====== 查询表单 ======
+// 查询表单
 const [Form] = useVbenForm({
   layout: 'horizontal',
-  submitButtonOptions: {
-    content: '查询',
-    style: 'margin-left: 10px;',
-  },
+  submitButtonOptions: { content: '查询', style: 'margin-left: 10px;' },
   handleSubmit: (values) => {
     ElMessage.success(`表单数据：${JSON.stringify(values)}`);
   },
@@ -64,12 +57,14 @@ const [Form] = useVbenForm({
       component: 'Input',
       fieldName: 'appleId',
       label: 'Apple Id',
-      componentProps: {
-        style: 'width: 240px',
-        placeholder: '请输入苹果账号',
-      },
+      componentProps: { style: 'width: 240px', placeholder: '请输入苹果账号' },
     },
   ],
+});
+
+// 初始化
+onMounted(async () => {
+  await certificateStore.fetchCertificates();
 });
 </script>
 
@@ -83,19 +78,18 @@ const [Form] = useVbenForm({
 
       <!-- 表格 -->
       <ElCard class="mb-5">
-        <!-- 工具栏 -->
         <div class="mb-3 flex justify-end gap-2">
           <ElButton type="primary" @click="handleAdd">添加</ElButton>
           <ElButton @click="handleRefresh">刷新</ElButton>
         </div>
 
-        <ElTable :data="tableData" border style="width: 100%">
-          <ElTableColumn label="序号" prop="id" width="80" />
+        <ElTable :data="certificateStore.certificates" border style="width: 100%">
+          <ElTableColumn label="序号" prop="id" width="60" />
           <ElTableColumn label="Apple Id" prop="appleId" />
-          <ElTableColumn label="证书名称" prop="name" />
-          <ElTableColumn label="iPhone" prop="iPhone" />
-          <ElTableColumn label="iPad" prop="iPad" />
-          <ElTableColumn label="到期时间" prop="expire" />
+          <ElTableColumn label="证书名称" prop="certificateName" />
+          <ElTableColumn label="iPhone" prop="iPhoneMax" />
+          <ElTableColumn label="iPad" prop="iPadMax" />
+          <ElTableColumn label="到期时间" prop="expiryDate" />
           <ElTableColumn label="状态" prop="status" />
           <ElTableColumn fixed="right" label="操作" width="180">
             <template #default="scope">
@@ -107,7 +101,7 @@ const [Form] = useVbenForm({
       </ElCard>
     </div>
 
-    <!-- 挂载抽屉 -->
+    <!-- 抽屉 -->
     <Drawer />
   </Page>
 </template>

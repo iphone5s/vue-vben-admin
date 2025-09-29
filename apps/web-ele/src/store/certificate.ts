@@ -19,30 +19,54 @@ export const useCertificateStore = defineStore('certificate', () => {
     try {
       const data = await getCertificateListApi();
       certificates.value = data;
+    } catch (err) {
+      console.error('获取证书列表失败', err);
+      throw err;
     } finally {
       loading.value = false;
     }
   }
 
-  /** 添加证书 */
+  /** 添加证书（自动刷新列表） */
   async function addCertificate(payload: Certificate) {
-    await addCertificateApi(payload);
-  }
-
-  /** 编辑证书 */
-  async function updateCertificate(id: number, payload: Certificate) {
-    const updatedCert = await updateCertificateApi(id, payload);
-    const idx = certificates.value.findIndex((c) => c.id === id);
-    if (idx !== -1) {
-      certificates.value[idx] = updatedCert;
+    loading.value = true;
+    try {
+      await addCertificateApi(payload);
+      await fetchCertificates();
+    } catch (err) {
+      console.error('添加证书失败', err);
+      throw err;
+    } finally {
+      loading.value = false;
     }
-    return updatedCert;
   }
 
-  /** 删除证书 */
+  /** 编辑证书（自动刷新列表） */
+  async function updateCertificate(id: number, payload: Certificate) {
+    loading.value = true;
+    try {
+      await updateCertificateApi(id, payload);
+      await fetchCertificates();
+    } catch (err) {
+      console.error('更新证书失败', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  /** 删除证书（自动刷新列表） */
   async function removeCertificate(id: number) {
-    await deleteCertificateApi(id);
-    certificates.value = certificates.value.filter((c) => c.id !== id);
+    loading.value = true;
+    try {
+      await deleteCertificateApi(id);
+      await fetchCertificates();
+    } catch (err) {
+      console.error('删除证书失败', err);
+      throw err;
+    } finally {
+      loading.value = false;
+    }
   }
 
   function $reset() {
