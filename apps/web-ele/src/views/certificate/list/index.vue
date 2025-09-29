@@ -4,45 +4,31 @@ import { useCertificateStore } from '#/store/certificate';
 
 const certificateStore = useCertificateStore();
 
-const handleDetail = (row: any) => console.log('证书详情', row);
-const handleEdit = (row: any) => console.log('编辑证书', row);
-const handleDelete = (row: any) => console.log('删除证书', row);
+const handleDetail = (row: any) => {
+  console.log('证书详情', row);
+};
 
+const handleEdit = (row: any) => {
+  console.log('编辑证书', row);
+};
+
+const handleDelete = (row: any) => {
+  console.log('删除证书', row);
+};
+
+// VxeTable 配置
 const [Grid] = useVbenVxeGrid({
-  formOptions: {
-    collapsed: false,
-    schema: [
-      {
-        component: 'Input',
-        fieldName: 'appleId',
-        label: 'Apple Id',
-        componentProps: { placeholder: '请输入 Apple Id' },
-      },
-      {
-        component: 'Input',
-        fieldName: 'certificateName',
-        label: '证书名称',
-        componentProps: { placeholder: '请输入证书名称' },
-      },
-    ],
-    submitButtonOptions: { content: '查询' },
-    showCollapseButton: true,
-  },
   gridOptions: {
-    fit: true,           // 自动按容器宽度调整列宽
-    autoResize: true,    // 随容器变化自动调整
-    border: true,
-    stripe: true,
-    showOverflow: true,
-    height: 'auto',
+    fit: true, // 表格宽度自动填充
     columns: [
-      { field: 'id', title: 'ID', width: 80 },
-      { field: 'appleId', title: 'Apple Id', width: 180 },
-      { field: 'certificateName', title: '证书名称', width: 200 },
+      { field: 'id', title: 'ID', width: 60 }, // 固定宽
+      { field: 'appleId', title: 'Apple Id', minWidth: 100, flex: 2 }, // 20%
+      { field: 'certificateName', title: '证书名称', minWidth: 250, flex: 3 }, // 30%
       {
         field: 'iphone',
         title: 'iPhone',
-        minWidth: 120,
+        minWidth: 20,
+        flex: 1, // 10%
         cellRender: {
           name: 'CellCustom',
           options: {
@@ -56,7 +42,8 @@ const [Grid] = useVbenVxeGrid({
       {
         field: 'ipad',
         title: 'iPad',
-        minWidth: 100,
+        minWidth: 20,
+        flex: 1, // 10%
         cellRender: {
           name: 'CellCustom',
           options: {
@@ -67,11 +54,25 @@ const [Grid] = useVbenVxeGrid({
           }
         }
       },
-      { field: 'expiryDate', title: '到期时间', minWidth: 130 },
+      { 
+        field: 'expiryDate',
+        title: '到期时间',
+        minWidth: 120,
+        flex: 2, // 20%
+        formatter: ({ cellValue }) => {
+          if (!cellValue) return '';
+          const date = new Date(cellValue);
+          const y = date.getFullYear();
+          const m = date.getMonth() + 1;
+          const d = date.getDate();
+          return `${y}年${m}月${d}日`;
+        }
+      },
       {
         field: 'status',
         title: '状态',
-        minWidth: 100,
+        minWidth: 20,
+        flex: 1, // 10%
         cellRender: {
           name: 'CellCustom',
           options: {
@@ -85,12 +86,15 @@ const [Grid] = useVbenVxeGrid({
       {
         field: 'action',
         title: '操作',
-        minWidth: 220,
-        slots: { default: 'action' }  // 自定义操作列
+        width: 200, // 固定宽
+        slots: { default: 'action' } 
       }
     ],
     proxyConfig: {
-      props: { result: 'items', total: 'total' },
+      props: {
+        result: 'items',
+        total: 'total'
+      },
       ajax: {
         query: async () => {
           const data = await certificateStore.fetchCertificates();
@@ -101,16 +105,20 @@ const [Grid] = useVbenVxeGrid({
     },
     toolbarConfig: {
       refresh: true,
-      zoom: true,
-      search: true
-    }
+      zoom: true
+    },
+    border: true,
+    stripe: true,
+    showOverflow: true,
+    height: 'auto'
   }
 });
 </script>
 
 <template>
-  <div class="p-4 w-full">
+  <div class="p-4">
     <Grid table-title="证书列表">
+      <!-- 自定义操作列 -->
       <template #action="{ row }">
         <button class="mr-2 text-blue-500" @click="handleDetail(row)">详情</button>
         <button class="mr-2 text-green-500" @click="handleEdit(row)">编辑</button>
