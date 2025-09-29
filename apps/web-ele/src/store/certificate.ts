@@ -26,9 +26,7 @@ export const useCertificateStore = defineStore('certificate', () => {
 
   /** 添加证书 */
   async function addCertificate(payload: Certificate) {
-    const newCert = await addCertificateApi(payload);
-    certificates.value.push(newCert);
-    return newCert;
+    await addCertificateApi(payload);
   }
 
   /** 编辑证书 */
