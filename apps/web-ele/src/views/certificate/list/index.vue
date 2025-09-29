@@ -6,9 +6,10 @@ import { Page, useVbenForm, useVbenDrawer } from '@vben/common-ui';
 import ExtraDrawer from './drawer.vue';
 import { useCertificateStore } from '#/store';
 
+// ====== Pinia store ======
 const certificateStore = useCertificateStore();
 
-// 抽屉
+// ====== 抽屉 ======
 const [Drawer, drawerApi] = useVbenDrawer({
   connectedComponent: ExtraDrawer,
 });
@@ -32,6 +33,11 @@ const handleDelete = async (row: any) => {
     ElMessage.error('删除失败');
     console.error(err);
   }
+};
+
+// 查看证书详情
+const handleDetail = (row: any) => {
+  drawerApi.setData({ title: '证书详情', record: row, readonly: true }).open();
 };
 
 // 刷新
@@ -85,14 +91,42 @@ onMounted(async () => {
 
         <ElTable :data="certificateStore.certificates" border style="width: 100%">
           <ElTableColumn label="序号" prop="id" width="60" />
-          <ElTableColumn label="Apple Id" prop="appleId" />
-          <ElTableColumn label="证书名称" prop="certificateName" />
-          <ElTableColumn label="iPhone" prop="iPhoneMax" />
-          <ElTableColumn label="iPad" prop="iPadMax" />
-          <ElTableColumn label="到期时间" prop="expiryDate" />
-          <ElTableColumn label="状态" prop="status" />
-          <ElTableColumn fixed="right" label="操作" width="180">
+          <ElTableColumn label="Apple Id" prop="appleId" min-width="220" />
+          <ElTableColumn label="证书名称" prop="certificateName" min-width="200" />
+
+          <!-- iPhone -->
+          <ElTableColumn label="iPhone" min-width="100">
             <template #default="scope">
+              <span :style="{ color: (scope.row.iphone + scope.row.mac) > scope.row.iphoneMax ? 'red' : 'inherit' }">
+                {{ scope.row.iphone + scope.row.mac }} / {{ scope.row.iphoneMax }}
+              </span>
+            </template>
+          </ElTableColumn>
+
+          <!-- iPad -->
+          <ElTableColumn label="iPad" min-width="100">
+            <template #default="scope">
+              <span :style="{ color: scope.row.ipad > scope.row.ipadMax ? 'red' : 'inherit' }">
+                {{ scope.row.ipad }} / {{ scope.row.ipadMax }}
+              </span>
+            </template>
+          </ElTableColumn>
+
+          <ElTableColumn label="到期时间" prop="expiryDate" min-width="120" />
+
+          <!-- 状态 -->
+          <ElTableColumn label="状态" min-width="80">
+            <template #default="scope">
+              <span :style="{ color: scope.row.status === '正常' ? 'green' : 'red' }">
+                {{ scope.row.status }}
+              </span>
+            </template>
+          </ElTableColumn>
+
+          <!-- 操作 -->
+          <ElTableColumn label="操作" min-width="240">
+            <template #default="scope">
+              <ElButton link type="primary" size="small" @click="handleDetail(scope.row)">详情</ElButton>
               <ElButton link type="primary" size="small" @click="handleEdit(scope.row)">编辑</ElButton>
               <ElButton link type="danger" size="small" @click="handleDelete(scope.row)">删除</ElButton>
             </template>
