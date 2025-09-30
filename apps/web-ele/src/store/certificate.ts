@@ -12,13 +12,14 @@ export const useCertificateStore = defineStore('certificate', () => {
   const loading = ref(false);
   const certificates = ref<Certificate[]>([]);
 
-  /** 获取证书列表，直接返回 getCertificateListApi 的结果 */
-  async function fetchCertificates() {
+  /** 获取证书列表，支持分页 */
+  async function fetchCertificates(params?: { page?: number; pageSize?: number }) {
     loading.value = true;
     try {
-      const data = await getCertificateListApi();
-      certificates.value = data.items; // 如果你还想在 store 里保存列表
-      return data; // { items, total } 直接返回
+      const { page = 1, pageSize = 10 } = params || {};
+      const data = await getCertificateListApi({ page, pageSize });
+      certificates.value = data.items; // 保存到 store
+      return data; // VxeTable 需要 { items, total }
     } catch (err) {
       console.error('获取证书列表失败', err);
       return { items: [], total: 0 };
@@ -31,7 +32,8 @@ export const useCertificateStore = defineStore('certificate', () => {
     loading.value = true;
     try {
       await addCertificateApi(payload);
-      await fetchCertificates();
+      // 添加后刷新第一页
+      await fetchCertificates({ page: 1, pageSize: 10 });
     } finally {
       loading.value = false;
     }
@@ -41,7 +43,8 @@ export const useCertificateStore = defineStore('certificate', () => {
     loading.value = true;
     try {
       await updateCertificateApi(id, payload);
-      await fetchCertificates();
+      // 更新后刷新当前页（可改成传参动态刷新）
+      await fetchCertificates({ page: 1, pageSize: 10 });
     } finally {
       loading.value = false;
     }
@@ -51,7 +54,8 @@ export const useCertificateStore = defineStore('certificate', () => {
     loading.value = true;
     try {
       await deleteCertificateApi(id);
-      await fetchCertificates();
+      // 删除后刷新当前页
+      await fetchCertificates({ page: 1, pageSize: 10 });
     } finally {
       loading.value = false;
     }

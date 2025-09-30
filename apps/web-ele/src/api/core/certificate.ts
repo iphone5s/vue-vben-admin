@@ -12,8 +12,13 @@ export interface Certificate {
   remark: string;
 }
 
-export function getCertificateListApi() {
-  return requestClient.post<Certificate[]>('/certificate/certificatelist');
+// 支持分页
+export function getCertificateListApi(params?: { page?: number; pageSize?: number }) {
+  const { page = 1, pageSize = 10 } = params || {};
+  return requestClient.post<{ items: Certificate[]; total: number }>('/certificate/certificatelist', {
+    page,
+    pageSize,
+  });
 }
 
 export function addCertificateApi(data: Certificate) {
