@@ -94,21 +94,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
   }  
 });  
   
-// 手动刷新数据  
-const handleRefresh = () => {  
-  gridApi.query();  
-  ElMessage.success('数据刷新成功');  
-};  
+
 </script>  
   
 <template>  
   <div class="p-4">  
-    <div class="mb-4">  
-      <el-button type="primary" @click="handleRefresh">  
-        刷新数据  
-      </el-button>  
-    </div>  
-      
     <Grid table-title="证书列表">  
       <!-- iPhone 设备数量显示 -->  
       <template #iphone="{ row }">  
