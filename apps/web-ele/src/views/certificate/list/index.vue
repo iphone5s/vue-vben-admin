@@ -85,7 +85,13 @@ const [Grid, gridApi] = useVbenVxeGrid({
       ajax: {
         // 接收分页参数
         query: async ({ page, pageSize }) => {
-          const data = await certificateStore.fetchCertificates({ page, pageSize });
+          const currentPage = page?.currentPage || 1;
+          const size = pageSize || page?.pageSize || 10;
+
+          const data = await certificateStore.fetchCertificates({
+            page: currentPage,
+            pageSize: size,
+          });
           console.log('VxeTable query 返回:', data);
           return data;
         },
@@ -99,14 +105,15 @@ const [Grid, gridApi] = useVbenVxeGrid({
     border: true,
     stripe: true,
     showOverflow: true,
-    height: '600',
+    height: '100%',
   },
 });
 </script>
 
 <template>
-  <div class="p-4">
-    <Grid table-title="证书列表">
+  <!-- 外层容器高度全屏，底部留 40px -->
+  <div class="p-4" style="height: 100vh; padding-bottom: 40px;">
+    <Grid table-title="证书列表" class="h-full">
       <!-- 添加按钮 -->
       <template #toolbar-tools>
         <el-button type="primary" @click="handleAdd">
