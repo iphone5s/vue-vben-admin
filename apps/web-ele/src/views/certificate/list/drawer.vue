@@ -6,11 +6,16 @@ import type { FormRules } from 'element-plus'
 
 import { useCertificateStore } from '#/store'
 
+// ------------------------
+// 1️⃣ 初始化 Store
+// ------------------------
 const certificateStore = useCertificateStore()
 
-// 表单默认值
+// ------------------------
+// 2️⃣ 默认表单值
+// ------------------------
 const defaultForm = {
-  appleId: 'example@apple.com', // 默认 Apple ID，可换手机号
+  appleId: 'example@apple.com', // 默认 Apple ID
   iPhoneMax: 50,
   iPadMax: 20,
   issuer: 'cf732136-95ee-4241-aece-b355a6938a2f',
@@ -19,10 +24,15 @@ const defaultForm = {
   remark: '测试备注',
 }
 
+// ------------------------
+// 3️⃣ 响应式表单 & 引用
+// ------------------------
 const form = ref({ ...defaultForm })
 const formRef = ref()
 
-// 校验规则
+// ------------------------
+// 4️⃣ 校验规则
+// ------------------------
 const rules: FormRules = {
   appleId: [
     {
@@ -45,14 +55,25 @@ const rules: FormRules = {
   remark: [{ required: true, message: '请输入备注', trigger: 'blur' }],
 }
 
+// ------------------------
+// 5️⃣ 使用 Drawer
+// ------------------------
 const [Drawer, drawerApi] = useVbenDrawer({
-  title: '新增证书',
   width: '600px',
   onConfirm: async () => {
     try {
       await formRef.value.validate()
       drawerApi.setState({ loading: true })
-      await certificateStore.addCertificate(form.value)
+
+      const externalData = drawerApi.getData<{ record?: typeof defaultForm }>()
+      if (externalData?.record) {
+        // 编辑模式
+        await certificateStore.updateCertificate(form.value)
+      } else {
+        // 新增模式
+        await certificateStore.addCertificate(form.value)
+      }
+
       drawerApi.close()
     } catch (err) {
       console.error('表单验证失败:', err)
@@ -61,15 +82,18 @@ const [Drawer, drawerApi] = useVbenDrawer({
     }
   },
   onOpenChange(isOpen: boolean) {
-    if (isOpen) {
-      const externalData = drawerApi.getData<{ title?: string; record?: typeof defaultForm }>()
-      if (externalData?.record) {
-        // 编辑模式
-        Object.assign(form.value, externalData.record)
-      } else {
-        // 新建模式，重置默认值
-        Object.assign(form.value, defaultForm)
-      }
+    if (!isOpen) return
+
+    const externalData = drawerApi.getData<{ record?: typeof defaultForm }>()
+
+    if (externalData?.record) {
+      // 编辑模式
+      Object.assign(form.value, externalData.record)
+      drawerApi.setState({ title: '编辑证书' })
+    } else {
+      // 新建模式，保留默认表单
+      Object.assign(form.value, { ...defaultForm })
+      drawerApi.setState({ title: '新建证书' })
     }
   },
 })

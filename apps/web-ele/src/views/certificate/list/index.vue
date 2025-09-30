@@ -17,7 +17,7 @@ const handleDetail = (row: any) => {
 };
 
 const handleEdit = (row: any) => {
-  ElMessage.success(`编辑证书: ${row.certificateName}`);
+  drawerApi.setData({record: row}).open();
 };
 
 const handleDelete = (row: any) => {
@@ -25,7 +25,7 @@ const handleDelete = (row: any) => {
 };
 
 const handleAdd = () => {
-  drawerApi.setData({ title: '新建证书', record: null }).open();
+  drawerApi.setData({record: null }).open();
 };
 
 // VxeTable 配置
