@@ -26,7 +26,7 @@ export function addCertificateApi(data: Certificate) {
 }
 
 export function updateCertificateApi(id: number, data: Certificate) {
-  return requestClient.put<Certificate>(`/certificate/${id}`, data);
+  return requestClient.post<Certificate>('/certificate/updateCertificate', id,data);
 }
 
 export function deleteCertificateApi(id: number) {
