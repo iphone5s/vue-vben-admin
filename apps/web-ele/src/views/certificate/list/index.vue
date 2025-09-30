@@ -36,8 +36,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
       { field: 'id', title: 'ID', width: 60 },
       { field: 'appleId', title: 'Apple Id', minWidth: 100, flex: 2 },
       { field: 'certificateName', title: '证书名称', minWidth: 250, flex: 3 },
-      { field: 'iphone', title: 'iPhone', minWidth: 120, flex: 1, slots: { default: 'iphone' } },
-      { field: 'ipad', title: 'iPad', minWidth: 100, flex: 1, slots: { default: 'ipad' } },
+      { field: 'iPhone', title: 'iPhone', minWidth: 120, flex: 1, slots: { default: 'iPhone' } },
+      { field: 'iPad', title: 'iPad', minWidth: 100, flex: 1, slots: { default: 'iPad' } },
       { 
         field: 'expiryDate', 
         title: '到期时间', 
@@ -77,15 +77,15 @@ const [Grid, gridApi] = useVbenVxeGrid({
         <el-button type="default" @click="gridApi.query()">刷新</el-button>
       </template>
 
-      <template #iphone="{ row }">
-        <span :style="{ color: row.iphone + row.mac > row.iphoneMax ? 'red' : 'inherit', fontWeight: row.iphone + row.mac > row.iphoneMax ? 'bold' : 'normal' }">
-          {{ row.iphone + row.mac }} / {{ row.iphoneMax }}
+      <template #iPhone="{ row }">
+        <span :style="{ color: row.iPhone + row.mac > row.iPhoneMax ? 'red' : 'inherit', fontWeight: row.iphone + row.mac > row.iphoneMax ? 'bold' : 'normal' }">
+          {{ row.iPhone + row.mac }} / {{ row.iPhoneMax }}
         </span>
       </template>
 
-      <template #ipad="{ row }">
-        <span :style="{ color: row.ipad > row.ipadMax ? 'red' : 'inherit', fontWeight: row.ipad > row.ipadMax ? 'bold' : 'normal' }">
-          {{ row.ipad }} / {{ row.ipadMax }}
+      <template #iPad="{ row }">
+        <span :style="{ color: row.iPad > row.iPadMax ? 'red' : 'inherit', fontWeight: row.iPad > row.iPadMax ? 'bold' : 'normal' }">
+          {{ row.iPad }} / {{ row.iPadMax }}
         </span>
       </template>
 
